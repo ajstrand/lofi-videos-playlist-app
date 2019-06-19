@@ -57,7 +57,7 @@ const GET_DATA = `
   }
 `;
 
-const axiosGitHubGraphQL = axios.create({
+const axiosGraphQLQuery = axios.create({
   baseURL: 'http://localhost:4000/graphql'
 });
 
@@ -75,11 +75,11 @@ function App() {
   }
 
   useEffect(() => {
-    onFetchFromGitHub();
+    getVideoIDs();
   }, []);
 
-  const onFetchFromGitHub = () => {
-    axiosGitHubGraphQL
+  const getVideoIDs = () => {
+    axiosGraphQLQuery
       .post('', { query: GET_DATA})
       .then(result => {
         let data = result.data.data;
@@ -98,11 +98,12 @@ function App() {
     event.target.pauseVideo();
   }
 
+  //TODO: actually implement method
   const switchVideo = () => {
     setVideoID("WEi50vf9I6E")
   }
 
-  let foo = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
+  let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
     let message = value.message;
     return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
   }) : <Text tabIndex={0} >{errors.message}</Text>  :null
@@ -112,7 +113,7 @@ function App() {
       <Cell row={1}>
         <Text tabIndex={0}>Stream lofi hiphop videos for studying/work/etc.</Text>
         <Text tabIndex={0}>Click the button the video to get another video.</Text>
-       {foo}
+       {serverErrors}
       </Cell>
       <VideoWrapper row={2}>
         <ResponsiveIframe
