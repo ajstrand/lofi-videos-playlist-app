@@ -50,9 +50,7 @@ const StyledButton = styled.button `
 const GET_DATA = `
   {
     videos {
-      id {
-        videoID
-      }
+      videoID
     }
   }
 `;
@@ -65,6 +63,7 @@ function App() {
   const [errors, setErrors] = useState(null);
   const [height, setHeight] = useState('390px');
   const [width, setWidth] = useState('640px');
+  const [videoList, setVideoList] = useState(null);
   const [videoID, setVideoID] = useState(null);
   const opts = {
     height: height,
@@ -76,20 +75,17 @@ function App() {
 
   useEffect(() => {
     getVideoIDs();
-  }, []);
+  });
 
   const getVideoIDs = () => {
     axiosGraphQLQuery
       .post('', { query: GET_DATA})
       .then(result => {
-        let data = result.data.data;
-        let videoID = data.videoDataList
-        console.log(videoID);
-        setVideoID(videoID);
+        let videos = result.data.data.videos;
+        setVideoList(videos);
+        setVideoID(videoList[2].videoID);
       }).catch(function (error) {
-        // handle error
-        console.log(error.response.data.errors);
-        setErrors(error.response.data.errors)
+        console.error(error)
       })
   };
 
@@ -98,9 +94,9 @@ function App() {
     event.target.pauseVideo();
   }
 
-  //TODO: actually implement method
   const switchVideo = () => {
-    setVideoID("WEi50vf9I6E")
+    console.log("in method")
+    setVideoID(videoList[4].videoID);
   }
 
   let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
@@ -123,7 +119,7 @@ function App() {
         />
       </VideoWrapper>
       <Cell row={3}>
-        <StyledButton onClick={ () => switchVideo()}>Watch Another Video</StyledButton>
+        <StyledButton onClick={ () => switchVideo}>Watch Another Video</StyledButton>
       </Cell>
     </Grid>
   );

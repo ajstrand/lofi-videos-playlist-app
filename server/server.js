@@ -1,9 +1,35 @@
 require('dotenv').config()
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-var cors = require('cors')
+const cors = require('cors')
+const { google } = require('googleapis');
+const redis = require("redis");
+
+const client = redis.createClient();
 const app = express();
-const {google} = require('googleapis');
+
+
+
+client.on("error", function (err) {
+  console.log("Error " + err);
+});
+
+//TODO: patch this out before deploy to prod
+/*client.flushall('ASYNC', () => {
+  console.log("cleared")
+});*/
+
+client.lrange("videoData", 0, -1, (error, data) => {
+  if (error || data === null || data === undefined || data.length === 0) {
+    console.log(error)
+    getVideos()
+    console.log("requesting api data")
+  }
+  else {
+    console.log(JSON.parse(data));
+    console.log("got data from redis instead")
+  }
+})
 
 const {
   GraphQLList,
@@ -19,33 +45,26 @@ const youtube = google.youtube({
 });
 
 let data = [];
-
 async function getVideos() {
   const res = await youtube.search.list({
     part: 'snippet',
     q: 'lofi hiphop',
   });
   let items = res.data.items;
-  console.log(items);
   data = items.map((value, i) => {
-    let o = {
-      videoID:value["id"]["videoID"]
+    let videoDataObject = {
+      videoID: value.id.videoId
     }
-    return o;
+    return videoDataObject;
   });
+  console.log(data)
+  client.rpush(["videoData", JSON.stringify(data)]);
 }
-
-const idFieldsType = new GraphQLObjectType({
-  name: 'idFields',
-  fields: () => ({
-    videoID: { type: GraphQLString }
-  })
-});
 
 const videoType = new GraphQLObjectType({
   name: 'video',
   fields: {
-   id: {type:idFieldsType}
+    videoID: { type: GraphQLString }
   }
 })
 
@@ -62,8 +81,6 @@ const schema = new GraphQLSchema({
     }
   })
 });
-
-getVideos()
 
 app.use('/graphql', cors(), graphqlHTTP({
   schema: schema,

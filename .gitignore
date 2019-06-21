@@ -13,6 +13,10 @@
 
 .env
 
+.vscode/
+
+dump.rdb
+
 # misc
 .DS_Store
 .env.local
