@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 An app that plays lofi hiphop videos from YouTube. Provides a streamlined experience and a minimal UI.
 
-Built with React Hooks, Node(Express) and GraphQL.
+Built with React Hooks, Node(Express), Redis and GraphQL.
 
 ## Acknowledgements:
 Videos courtesy of YouTube's data API. 
