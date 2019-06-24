@@ -24,7 +24,7 @@ const VideoWrapper = styled(Cell)`
     flex-basis:500px;
 `;
 
-const ResponsiveIframe = styled(YouTube) `
+const ResponsiveIframe = styled(YouTube)`
     position: absolute;
 	  top: 0;
     left: 0;
@@ -32,12 +32,12 @@ const ResponsiveIframe = styled(YouTube) `
 	  height: 100%;
 `;
 
-const Text = styled.p `
+const Text = styled.p`
     color:#eeeeee;
     margin-top:15px;
 `;
 
-const StyledButton = styled.button `
+const StyledButton = styled.button`
   padding:15px;
   cursor:pointer;
   margin-top:30px;
@@ -63,9 +63,10 @@ function App() {
   const [errors, setErrors] = useState(null);
   const [height, setHeight] = useState('390px');
   const [width, setWidth] = useState('640px');
-  const [videoList, setVideoList] = useState(null);
+  const [videoList, setVideoList] = useState([]);
   const [videoID, setVideoID] = useState(null);
   const opts = {
+    host: `${window.location.protocol}//www.youtube.com`,
     height: height,
     width: width,
     playerVars: {
@@ -74,20 +75,27 @@ function App() {
   }
 
   useEffect(() => {
-    getVideoIDs();
+    if (videoList.length === 0) {
+      axiosGraphQLQuery
+        .post('', { query: GET_DATA })
+        .then(result => {
+          let videos = result.data.data.videos;
+          if (videos.length !== 0) {
+            setVideoList(videos);
+            let randomVideoNumberFromList = Math.floor(Math.random() *Math.floor(videos.length - 1));
+            if(videos[randomVideoNumberFromList] && videos[randomVideoNumberFromList].videoID !== undefined){
+              setVideoID(videos[randomVideoNumberFromList].videoID)
+            }
+          }
+          else {
+            setErrors("no videos returned or another error occurred")
+          }
+        }).catch(function (error) {
+          console.error(error)
+          setErrors(error)
+        });
+    }
   });
-
-  const getVideoIDs = () => {
-    axiosGraphQLQuery
-      .post('', { query: GET_DATA})
-      .then(result => {
-        let videos = result.data.data.videos;
-        setVideoList(videos);
-        setVideoID(videoList[2].videoID);
-      }).catch(function (error) {
-        console.error(error)
-      })
-  };
 
   // access to player in all event handlers via event.target
   const _onReady = (event) => {
@@ -95,31 +103,37 @@ function App() {
   }
 
   const switchVideo = () => {
-    console.log("in method")
-    setVideoID(videoList[4].videoID);
+    if (videoList !== null) {
+      let randomVideoNumberFromList = Math.floor(Math.random() *Math.floor(videoList.length - 1));
+      setVideoID(videoList[randomVideoNumberFromList].videoID);
+    }
   }
 
   let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
     let message = value.message;
     return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
-  }) : <Text tabIndex={0} >{errors.message}</Text>  :null
+  }) : <Text tabIndex={0} >{errors.message}</Text> : null
 
   return (
     <Grid>
       <Cell row={1}>
         <Text tabIndex={0}>Stream lofi hiphop videos for studying/work/etc.</Text>
         <Text tabIndex={0}>Click the button the video to get another video.</Text>
-       {serverErrors}
+        
       </Cell>
-      <VideoWrapper row={2}>
+      {videoList.length !== 0 || serverErrors !== null ? <VideoWrapper row={2}>
         <ResponsiveIframe
           videoId={videoID}
           opts={opts}
           onReady={() => _onReady}
         />
-      </VideoWrapper>
+      </VideoWrapper> :
+        <Cell row={2}>
+          {serverErrors}
+        </Cell>
+      }
       <Cell row={3}>
-        <StyledButton onClick={ () => switchVideo}>Watch Another Video</StyledButton>
+        <StyledButton onClick={() => switchVideo()}>Watch Another Video</StyledButton>
       </Cell>
     </Grid>
   );

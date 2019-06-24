@@ -4,6 +4,12 @@ const graphqlHTTP = require('express-graphql');
 const cors = require('cors')
 const { google } = require('googleapis');
 const redis = require("redis");
+const {
+  GraphQLList,
+  GraphQLSchema,
+  GraphQLObjectType,
+  GraphQLString
+} = require('graphql');
 
 const client = redis.createClient();
 const app = express();
@@ -15,9 +21,9 @@ client.on("error", function (err) {
 });
 
 //TODO: patch this out before deploy to prod
-/*client.flushall('ASYNC', () => {
+client.flushall('ASYNC', () => {
   console.log("cleared")
-});*/
+});
 
 client.lrange("videoData", 0, -1, (error, data) => {
   if (error || data === null || data === undefined || data.length === 0) {
@@ -31,34 +37,38 @@ client.lrange("videoData", 0, -1, (error, data) => {
   }
 })
 
-const {
-  GraphQLList,
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLString
-} = require('graphql');
-
-// initialize the Youtube API library
 const youtube = google.youtube({
   version: 'v3',
   auth: process.env.YOUTUBE_API_KEY,
 });
 
+const searchTerms = ['lofi hiphop playlist',
+  'lofi study playlist',
+  '/ lofi study playlist',
+  '/ lofi hiphop playlist',
+  "lofi hip hop mix",
+  "lofi hiphop mix",
+  "lofi work and chill playlist"];
+
+
 let data = [];
 async function getVideos() {
+  const random = Math.floor(Math.random() * Math.floor(searchTerms.length - 1));
+  const randomSearchTerm = searchTerms[random];
   const res = await youtube.search.list({
     part: 'snippet',
-    q: 'lofi hiphop',
+    q: randomSearchTerm,
+    maxResults: 25,
   });
-  let items = res.data.items;
-  data = items.map((value, i) => {
-    let videoDataObject = {
-      videoID: value.id.videoId
-    }
-    return videoDataObject;
-  });
-  console.log(data)
-  client.rpush(["videoData", JSON.stringify(data)]);
+  data = res.data.items
+    .filter((jsonObj) => jsonObj.id.videoId !== null && jsonObj.id.videoId !== undefined)
+    .map(obj => {
+      return {
+        videoID: obj.id.videoId
+      }
+    });
+  const jsonData = JSON.stringify(data);
+  client.rpush(["videoData", jsonData]);
 }
 
 const videoType = new GraphQLObjectType({
