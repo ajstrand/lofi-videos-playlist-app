@@ -136,7 +136,7 @@ function App() {
       <Cell row={1}>
         <Text tabIndex={0}>Stream lofi hiphop videos for studying/work/etc.</Text>
         <Text tabIndex={0}>Click the button the video to get another video.</Text>
-        {title ? <Text>title: {title}</Text> : null}
+        {title ? <Text tabIndex={0}>title: {title}</Text> : null}
       </Cell>
       {render}
       <Cell row={3}>
