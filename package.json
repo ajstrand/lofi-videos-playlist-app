@@ -21,8 +21,8 @@
   },
   "scripts": {
     "redis": "redis-server",
-    "server": "node server/server.js",
-    "server-clear": "node server/server.js clear",
+    "server": "node server.js",
+    "server-clear": "node server.js clear",
     "start": "react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test",
