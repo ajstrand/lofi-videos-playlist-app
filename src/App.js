@@ -57,6 +57,16 @@ const GET_DATA = `
   }
 `;
 
+axios.interceptors.response.use((response) => {
+  return response;
+},  (error) => {
+  // Do something with response error
+  if (error.response.status === 404) {
+    console.error(" server error occurred");
+  }
+  return Promise.reject(error.response);
+});
+
 const axiosGraphQLQuery = axios.create({
   baseURL: '/api/graphql'
 });
@@ -97,7 +107,7 @@ function App() {
             setErrors(<Text>no videos returned or another error occurred</Text>)
             throw new Error("no videos returned or another error occurred")
           }
-        }).catch(function (error) {
+        }).catch((error) => {
           console.error(error)
           let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
             let message = value.message;
