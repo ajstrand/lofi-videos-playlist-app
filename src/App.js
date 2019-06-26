@@ -85,6 +85,7 @@ function App() {
 
   useEffect(() => {
     if (videoList.length === 0) {
+      axios.get('/api/test').then(response => console.log(response.data))
       const graphQL_URL = '/api/graphql';
       axios
         .post(graphQL_URL, { query: GET_DATA })
