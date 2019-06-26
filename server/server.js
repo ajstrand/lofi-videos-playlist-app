@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
-const cors = require('cors')
 const { google } = require('googleapis');
 const redis = require("redis");
 const {
@@ -10,9 +9,14 @@ const {
   GraphQLObjectType,
   GraphQLString
 } = require('graphql');
+const helmet = require('helmet');
+const path = require('path');
 
 const client = redis.createClient();
 const app = express();
+
+let graphQLQueryData = [];
+
 
 
 
@@ -20,10 +24,14 @@ client.on("error", function (err) {
   console.log("Error " + err);
 });
 
-//TODO: patch this out before deploy to prod
-client.flushall('ASYNC', () => {
-  console.log("cleared")
-});
+
+let clear = process.argv[2]
+
+if(clear && clear === "clear"){
+  client.flushall('ASYNC', () => {
+    console.log("redis cache cleared")
+  });
+}
 
 client.lrange("videoData", 0, -1, (error, data) => {
   if (error || data === null || data === undefined || data.length === 0) {
@@ -32,8 +40,8 @@ client.lrange("videoData", 0, -1, (error, data) => {
     console.log("requesting api data")
   }
   else {
-    console.log(JSON.parse(data));
     console.log("got data from redis instead")
+    graphQLQueryData = JSON.parse(data);
   }
 })
 
@@ -51,30 +59,36 @@ const searchTerms = ['lofi hiphop playlist',
   "lofi work and chill playlist"];
 
 
-let data = [];
 async function getVideos() {
   const random = Math.floor(Math.random() * Math.floor(searchTerms.length - 1));
   const randomSearchTerm = searchTerms[random];
-  const res = await youtube.search.list({
-    part: 'snippet',
-    q: randomSearchTerm,
-    maxResults: 25,
-  });
-  data = res.data.items
-    .filter((jsonObj) => jsonObj.id.videoId !== null && jsonObj.id.videoId !== undefined)
-    .map(obj => {
-      return {
-        videoID: obj.id.videoId
-      }
+  try {
+    const res = await youtube.search.list({
+      part: 'snippet',
+      q: randomSearchTerm,
+      maxResults: 25,
     });
-  const jsonData = JSON.stringify(data);
-  client.rpush(["videoData", jsonData]);
+    graphQLQueryData = res.data.items
+      .filter((jsonObj) => jsonObj.id.videoId !== null && jsonObj.id.videoId !== undefined)
+      .map(obj => {
+        return {
+          title: obj.snippet.title,
+          videoID: obj.id.videoId
+        }
+      });
+    const jsonData = JSON.stringify(graphQLQueryData);
+    client.rpush(["videoData", jsonData]);
+    console.log("got data from the API");
+  } catch(error) {
+    console.error(`an error occurred trying to fetch data ${error}`)
+  }
 }
 
 const videoType = new GraphQLObjectType({
   name: 'video',
   fields: {
-    videoID: { type: GraphQLString }
+    videoID: { type: GraphQLString },
+    title: { type: GraphQLString }
   }
 })
 
@@ -85,16 +99,23 @@ const schema = new GraphQLSchema({
       videos: {
         type: GraphQLList(videoType),
         resolve() {
-          return data;
+          return graphQLQueryData;
         }
       }
     }
   })
 });
 
-app.use('/graphql', cors(), graphqlHTTP({
+app.use(helmet());
+
+app.use(express.static(path.join(__dirname, '../build')));
+
+app.use('/api/graphql', graphqlHTTP({
   schema: schema,
   graphiql: true
 }));
 
-app.listen(4000);
+const port = 4000;
+
+app.listen(port);
+console.log(`server running on port ${port}`);

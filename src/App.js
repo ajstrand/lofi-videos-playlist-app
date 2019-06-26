@@ -13,6 +13,7 @@ const Cell = styled.div`
   align-items:center;
   grid-row-start:${props => props.row ? props.row : "1"};
   grid-column-start:2;
+  marginBottom:15px;
 `;
 
 const VideoWrapper = styled(Cell)`
@@ -51,12 +52,13 @@ const GET_DATA = `
   {
     videos {
       videoID
+      title
     }
   }
 `;
 
 const axiosGraphQLQuery = axios.create({
-  baseURL: 'http://localhost:4000/graphql'
+  baseURL: '/api/graphql'
 });
 
 function App() {
@@ -64,6 +66,7 @@ function App() {
   const [height, setHeight] = useState('390px');
   const [width, setWidth] = useState('640px');
   const [videoList, setVideoList] = useState([]);
+  const [title, setTitle] = useState(null);
   const [videoID, setVideoID] = useState(null);
   const opts = {
     host: `${window.location.protocol}//www.youtube.com`,
@@ -82,17 +85,26 @@ function App() {
           let videos = result.data.data.videos;
           if (videos.length !== 0) {
             setVideoList(videos);
-            let randomVideoNumberFromList = Math.floor(Math.random() *Math.floor(videos.length - 1));
-            if(videos[randomVideoNumberFromList] && videos[randomVideoNumberFromList].videoID !== undefined){
-              setVideoID(videos[randomVideoNumberFromList].videoID)
+            let randomVideoNumber = Math.floor(Math.random() * Math.floor(videos.length - 1));
+            if (videos[randomVideoNumber] &&
+              videos[randomVideoNumber].videoID !== undefined &&
+              videos[randomVideoNumber] !== null) {
+              setVideoID(videos[randomVideoNumber].videoID)
+              setTitle(videos[randomVideoNumber].title)
             }
           }
           else {
-            setErrors("no videos returned or another error occurred")
+            setErrors(<Text>no videos returned or another error occurred</Text>)
+            throw new Error("no videos returned or another error occurred")
           }
         }).catch(function (error) {
           console.error(error)
-          setErrors(error)
+          let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
+            let message = value.message;
+            return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
+          }) : <Text tabIndex={0} >{errors.message}</Text> : null
+          setErrors(serverErrors)
+          throw new Error("server error occurred")
         });
     }
   });
@@ -103,37 +115,32 @@ function App() {
   }
 
   const switchVideo = () => {
-    if (videoList !== null) {
-      let randomVideoNumberFromList = Math.floor(Math.random() *Math.floor(videoList.length - 1));
-      setVideoID(videoList[randomVideoNumberFromList].videoID);
-    }
+    let randomVideoNumber = Math.floor(Math.random() * Math.floor(videoList.length - 1));
+    setVideoID(videoList[randomVideoNumber].videoID);
+    setTitle(videoList[randomVideoNumber].title)
   }
 
-  let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
-    let message = value.message;
-    return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
-  }) : <Text tabIndex={0} >{errors.message}</Text> : null
+  const render = videoList.length !== 0 && errors === null && videoID ? <VideoWrapper row={2}>
+    <ResponsiveIframe
+      videoId={videoID}
+      opts={opts}
+      onReady={() => _onReady}
+    />
+  </VideoWrapper> :
+    <Cell row={2}>
+      {errors}
+    </Cell>
 
   return (
     <Grid>
       <Cell row={1}>
         <Text tabIndex={0}>Stream lofi hiphop videos for studying/work/etc.</Text>
         <Text tabIndex={0}>Click the button the video to get another video.</Text>
-        
+        {title ? <Text>title: {title}</Text> : null}
       </Cell>
-      {videoList.length !== 0 || serverErrors !== null ? <VideoWrapper row={2}>
-        <ResponsiveIframe
-          videoId={videoID}
-          opts={opts}
-          onReady={() => _onReady}
-        />
-      </VideoWrapper> :
-        <Cell row={2}>
-          {serverErrors}
-        </Cell>
-      }
+      {render}
       <Cell row={3}>
-        <StyledButton onClick={() => switchVideo()}>Watch Another Video</StyledButton>
+        <StyledButton disabled={errors !== null && errors !== undefined} onClick={() => switchVideo()}>Watch Another Video</StyledButton>
       </Cell>
     </Grid>
   );

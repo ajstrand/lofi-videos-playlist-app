@@ -10,16 +10,19 @@
     "express-graphql": "^0.8.0",
     "googleapis": "^40.0.0",
     "graphql": "^14.3.1",
+    "helmet": "^3.18.0",
+    "path": "^0.12.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
     "react-youtube": "^7.9.0",
     "redis": "^2.8.0",
-    "styled-components": "^4.3.1"
+    "styled-components": "^4.3.2"
   },
   "scripts": {
-    "redis":"redis-server",
+    "redis": "redis-server",
     "server": "node server/server.js",
+    "server-clear": "node server/server.js clear",
     "start": "react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test",
