@@ -110,7 +110,12 @@ app.use(helmet());
 
 app.use(express.static(path.join(__dirname, '../build')));
 
-app.use('/api/graphql', graphqlHTTP({
+app.get('/api/test', (req, res) => {
+  const hello = "hello from the server, this is a test";
+  res.send(JSON.stringify(hello));
+})
+
+app.post('/api/graphql', graphqlHTTP({
   schema: schema,
   graphiql: true
 }));

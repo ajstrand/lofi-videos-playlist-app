@@ -67,10 +67,6 @@ axios.interceptors.response.use((response) => {
   return Promise.reject(error.response);
 });
 
-const axiosGraphQLQuery = axios.create({
-  baseURL: '/api/graphql'
-});
-
 function App() {
   const [errors, setErrors] = useState(null);
   const [height, setHeight] = useState('390px');
@@ -89,8 +85,9 @@ function App() {
 
   useEffect(() => {
     if (videoList.length === 0) {
-      axiosGraphQLQuery
-        .post('', { query: GET_DATA })
+      const graphQL_URL = '/api/graphql';
+      axios
+        .post(graphQL_URL, { query: GET_DATA })
         .then(result => {
           let videos = result.data.data.videos;
           if (videos.length !== 0) {
