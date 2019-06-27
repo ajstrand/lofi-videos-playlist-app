@@ -49,7 +49,7 @@ function App() {
           handleErrors(error);
         });
     }
-  }, [videoList]);
+  }, []);
 
   const handleErrors = (errors) => {
     console.error(errors)
