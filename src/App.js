@@ -42,20 +42,24 @@ function App() {
             }
           }
           else {
-            setErrors(<Text>no videos returned or another error occurred</Text>)
-            throw new Error("no videos returned or another error occurred")
+            handleErrors("no videos returned from server");
+
           }
         }).catch((error) => {
-          console.error(error)
-          let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
-            let message = value.message;
-            return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
-          }) : <Text tabIndex={0} >{errors.message}</Text> : null
-          setErrors(serverErrors)
-          throw new Error("server error occurred")
+          handleErrors(error);
         });
     }
-  });
+  }, [videoList]);
+
+  const handleErrors = (errors) => {
+    console.error(errors)
+    let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
+      let message = value.message;
+      return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
+    }) : <Text tabIndex={0} >{errors.message ? errors.message : errors}</Text> : null
+    setErrors(serverErrors)
+    throw new Error("server error occurred")
+  }
 
   // access to player in all event handlers via event.target
   const _onReady = (event) => {
