@@ -22,9 +22,9 @@
   },
   "scripts": {
     "redis": "redis-server",
-    "server": "cross-env NODE_ENV=production node server.js",
+    "start": "cross-env NODE_ENV=production node server.js",
     "server-clear": "cross-env NODE_ENV=production node server.js clear",
-    "start": "react-scripts start --no-cache",
+    "react-dev": "react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

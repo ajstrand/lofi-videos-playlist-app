@@ -127,7 +127,6 @@ app.post('/api/graphql', graphqlHTTP({
   graphiql: true
 }));
 
-//i think heroku likes to assign its own port, so i cant hard code it
 const port = process.env.PORT || 4000;
 
 app.listen(port);
