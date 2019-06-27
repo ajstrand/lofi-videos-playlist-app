@@ -12,7 +12,7 @@ const {
 const helmet = require('helmet');
 const path = require('path');
 
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL);
 const app = express();
 
 let graphQLQueryData = [];
