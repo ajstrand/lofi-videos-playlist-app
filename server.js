@@ -80,7 +80,9 @@ async function getVideos() {
     client.rpush(["videoData", jsonData]);
     console.log("got data from the API");
   } catch(error) {
-    console.error(`an error occurred trying to fetch data ${error}`)
+    console.error("an error occurred trying to fetch data")
+    console.log(error)
+
   }
 }
 
