@@ -10,16 +10,6 @@ const GET_DATA = `
   }
 `;
 
-axios.interceptors.response.use((response) => {
-  return response;
-}, (error) => {
-  // Do something with response error
-  if (error.response.status === 404) {
-    console.error(" server error occurred");
-  }
-  return Promise.reject(error.response);
-});
-
 function App() {
   const [errors, setErrors] = useState(null);
   const [videoList, setVideoList] = useState([]);
