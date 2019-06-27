@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "cors": "^2.8.5",
+    "cross-env": "^5.2.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "express-graphql": "^0.8.0",
@@ -21,9 +22,9 @@
   },
   "scripts": {
     "redis": "redis-server",
-    "server": "node server/server.js",
-    "server-clear": "node server/server.js clear",
-    "start": "react-scripts start --no-cache",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "server-clear": "cross-env NODE_ENV=production node server.js clear",
+    "react-dev": "react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
