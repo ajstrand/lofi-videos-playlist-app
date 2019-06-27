@@ -42,6 +42,6 @@ export const StyledButton = styled.button`
   margin-top:30px;
   font-size:20px;
   border:none;
-  background-color:#00adb5;
+  background-color:#ca3e47;
   color:#eeeeee;
 `;
