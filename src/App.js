@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
+import MDSpinner from "react-md-spinner";
 import {
   Grid,
   Cell,
@@ -18,7 +19,10 @@ const GET_DATA = `
 `;
 
 function App() {
-  const [middleCellProps, setMiddleCellProps] = useState({});
+  const [isLoading, setLoading] = useState(false);
+  const [middleCellProps, setMiddleCellProps] = useState(
+    { flex: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }
+  );
   const [errors, setErrors] = useState(null);
   const [videoList, setVideoList] = useState([]);
   const [title, setTitle] = useState(null);
@@ -34,10 +38,12 @@ function App() {
 
   useEffect(() => {
     if (videoList.length === 0) {
+      setLoading(true);
       const graphQL_URL = '/api/graphql';
       axios
         .post(graphQL_URL, { query: GET_DATA })
         .then(result => {
+          setLoading(false);
           let videos = result.data.data.videos;
           if (videos.length !== 0) {
             setVideoList(videos);
@@ -45,15 +51,16 @@ function App() {
             if (videos[randomVideoNumber] &&
               videos[randomVideoNumber].videoID !== undefined &&
               videos[randomVideoNumber] !== null) {
+              setMiddleCellProps({})
               setVideoID(videos[randomVideoNumber].videoID)
               setTitle(videos[randomVideoNumber].title)
             }
           }
           else {
             handleErrors("no videos returned from server");
-
           }
         }).catch((error) => {
+          setLoading(false);
           handleErrors(error);
         });
     }
@@ -82,22 +89,18 @@ function App() {
 
   const middleContent = () => {
     let content = videoList.length !== 0 && errors === null && videoID ?
-    <VideoWrapper>
-      <ResponsiveIframe
-        videoId={videoID}
-        opts={opts}
-        onReady={() => _onReady}
-      />
-    </VideoWrapper> :
-    errors;
-
-    if(errors){
-      setMiddleCellProps({flex:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"})
-    }
+      <VideoWrapper>
+        <ResponsiveIframe
+          videoId={videoID}
+          opts={opts}
+          onReady={() => _onReady}
+        />
+      </VideoWrapper> :
+      errors;
 
     return content;
 
-  }    
+  }
 
   return (
     <Grid>
@@ -107,11 +110,12 @@ function App() {
         {title ? <Text tabIndex={0}>title: {title}</Text> : null}
       </Cell>
       <Cell aria-live="polite" aria-atomic="true" {...middleCellProps} row={2}>
-        {middleContent()}
+        {!isLoading ? middleContent() : <MDSpinner />}
       </Cell>
-      <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={'flex-start'} row={3}>
-        <StyledButton disabled={errors !== null && errors !== undefined} onClick={() => switchVideo()}>Watch Another Video</StyledButton>
-      </Cell>
+      {!isLoading ?
+        <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={'flex-start'} row={3}>
+          <StyledButton disabled={errors !== null && errors !== undefined} onClick={() => switchVideo()}>Watch Another Video</StyledButton>
+        </Cell> : null}
     </Grid>
   );
 }

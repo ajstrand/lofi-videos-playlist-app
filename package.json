@@ -17,6 +17,7 @@
     "path": "^0.12.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-md-spinner": "^1.0.0",
     "react-scripts": "3.0.1",
     "react-youtube": "^7.9.0",
     "redis": "^2.8.0",
@@ -33,7 +34,10 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": ["react-app", "jsx-a11y/recommended"]
+    "extends": [
+      "react-app",
+      "jsx-a11y/recommended"
+    ]
   },
   "browserslist": {
     "production": [
