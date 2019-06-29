@@ -3,8 +3,11 @@ import styled from "styled-components";
 export const Grid = styled.div`
   padding:15px;
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   grid-template-rows: 1fr 1fr 1fr;
+  @media screen and (min-width:500px) {
+    grid-template-rows: 250px 1fr 1fr;
+  }
 `;
 export const Cell = styled.div `
 grid-row-start:${props => props.row ? props.row : "1"};
