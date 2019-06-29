@@ -4,16 +4,15 @@ export const Grid = styled.div`
   padding:15px;
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));;
-  grid-template-rows: 250px 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
 `;
 export const Cell = styled.div `
 grid-row-start:${props => props.row ? props.row : "1"};
 grid-column-start:2;
-marginBottom:15px;
-display:${props => props.flex ? props.flex : null}
-flex-direction:${props => props.flexDirection ? props.flexDirection : null}
-align-items:${props => props.alignItems ? props.alignItems : null}
-justify-content:${props => props.justifyValue ? props.justifyValue : null}
+display:${props => props.flex ? props.flex : null};
+flex-direction:${props => props.flexDirection ? props.flexDirection : null};
+align-items:${props => props.alignItems ? props.alignItems : null};
+justify-content:${props => props.justifyValue ? props.justifyValue : null};
 `;
 export const VideoWrapper = styled(Cell)`
     overflow: hidden;
