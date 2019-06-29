@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
-import { Grid, Cell, Text, ResponsiveIframe, StyledButton, VideoWrapper } from './styledComponents/appComponents';
+import {
+  Grid,
+  Cell,
+  Text,
+  ResponsiveIframe,
+  StyledButton,
+  VideoWrapper,
+} from './styledComponents/appComponents';
 const GET_DATA = `
   {
     videos {
@@ -11,6 +18,7 @@ const GET_DATA = `
 `;
 
 function App() {
+  const [middleCellProps, setMiddleCellProps] = useState({});
   const [errors, setErrors] = useState(null);
   const [videoList, setVideoList] = useState([]);
   const [title, setTitle] = useState(null);
@@ -72,26 +80,36 @@ function App() {
     setTitle(videoList[randomVideoNumber].title)
   }
 
-  const render = videoList.length !== 0 && errors === null && videoID ? <VideoWrapper row={2}>
-    <ResponsiveIframe
-      videoId={videoID}
-      opts={opts}
-      onReady={() => _onReady}
-    />
-  </VideoWrapper> :
-    <Cell row={2}>
-      {errors}
-    </Cell>
+  const middleContent = () => {
+    let content = videoList.length !== 0 && errors === null && videoID ?
+    <VideoWrapper>
+      <ResponsiveIframe
+        videoId={videoID}
+        opts={opts}
+        onReady={() => _onReady}
+      />
+    </VideoWrapper> :
+    errors;
+
+    if(errors){
+      setMiddleCellProps({flex:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center"})
+    }
+
+    return content;
+
+  }    
 
   return (
     <Grid>
-      <Cell row={1}>
+      <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"} row={1}>
         <Text tabIndex={0}>Stream lofi hiphop videos for studying/work/etc.</Text>
         <Text tabIndex={0}>Click the button below the video to get another video.</Text>
         {title ? <Text tabIndex={0}>title: {title}</Text> : null}
       </Cell>
-      {render}
-      <Cell row={3}>
+      <Cell aria-live="polite" aria-atomic="true" {...middleCellProps} row={2}>
+        {middleContent()}
+      </Cell>
+      <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={'flex-start'} row={3}>
         <StyledButton disabled={errors !== null && errors !== undefined} onClick={() => switchVideo()}>Watch Another Video</StyledButton>
       </Cell>
     </Grid>

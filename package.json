@@ -7,11 +7,13 @@
     "cors": "^2.8.5",
     "cross-env": "^5.2.0",
     "dotenv": "^8.0.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
     "express": "^4.17.1",
     "express-graphql": "^0.8.0",
     "googleapis": "^40.0.0",
     "graphql": "^14.3.1",
     "helmet": "^3.18.0",
+    "nodemon": "^1.19.1",
     "path": "^0.12.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
@@ -22,6 +24,7 @@
   },
   "scripts": {
     "redis": "redis-server",
+    "dev": "npm run build && cross-env NODE_ENV=production nodemon server.js",
     "start": "cross-env NODE_ENV=production node server.js",
     "server-clear": "cross-env NODE_ENV=production node server.js clear",
     "react-dev": "react-scripts start --no-cache",
@@ -30,7 +33,7 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": ["react-app", "jsx-a11y/recommended"]
   },
   "browserslist": {
     "production": [
