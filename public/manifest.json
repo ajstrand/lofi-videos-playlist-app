@@ -8,8 +8,11 @@
       "type": "image/x-icon"
     }
   ],
-  "start_url": ".",
+  "scope": "/",
+  "start_url": "https://lofi-hiphop-videos.herokuapp.com/",
+  "description": "Lofi hiphop playlist app",
+  "orientation": "any",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#393e46",
+  "background_color": "#eeeeee"
 }
