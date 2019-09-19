@@ -110,7 +110,12 @@ function App() {
         {title ? <Text tabIndex={0}>title: {title}</Text> : null}
       </Cell>
       <Cell aria-live="polite" aria-atomic="true" {...middleCellProps} row={2}>
-        {!isLoading ? middleContent() : <MDSpinner />}
+        {!isLoading ? middleContent() : 
+        <Fragment>
+            <MDSpinner />
+            <Text>Currently loading videos. They should be available shortly. </Text> 
+        </Fragment>
+        }
       </Cell>
       {!isLoading ?
         <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={'flex-start'} row={3}>

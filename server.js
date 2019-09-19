@@ -54,6 +54,7 @@ const searchTerms = ['lofi hiphop playlist',
   'lofi study playlist',
   '/ lofi study playlist',
   '/ lofi hiphop playlist',
+  ' a n d l o f i',
   "lofi hip hop mix",
   "lofi hiphop mix",
   "lofi work and chill playlist"];
