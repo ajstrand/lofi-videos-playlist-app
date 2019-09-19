@@ -9,4 +9,4 @@ Built with React Hooks, Node(Express), Redis and GraphQL.
 ## Acknowledgements:
 Videos courtesy of YouTube's data API. 
 
-Thanks to rwieruch for his helpful tutorial on using [React with GraphQL](https://www.robinwieruch.de/react-with-graphql-tutorial/)
+Thanks to rwieruch for his helpful tutorial on using [React with GraphQL](https://www.robinwieruch.de/react-with-graphql-tutorial/) and https://graphql.org/graphql-js/
