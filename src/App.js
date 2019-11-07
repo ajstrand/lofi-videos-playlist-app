@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
-import MDSpinner from "react-md-spinner";
+import Bottom from "./Bottom";
+import Footer from "./Footer";
+import Header from "./Header";
+import VideoSection from "./VideoSection";
 import {
   Grid,
-  Cell,
   Text,
-  ResponsiveIframe,
-  StyledButton,
-  VideoWrapper,
 } from './styledComponents/appComponents';
 const GET_DATA = `
   {
@@ -27,14 +26,6 @@ function App() {
   const [videoList, setVideoList] = useState([]);
   const [title, setTitle] = useState(null);
   const [videoID, setVideoID] = useState(null);
-  const opts = {
-    host: `${window.location.protocol}//www.youtube.com`,
-    height: '390px',
-    width: '640px',
-    playerVars: {
-      autoplay: 0
-    }
-  }
 
   useEffect(() => {
     if (videoList.length === 0) {
@@ -67,18 +58,15 @@ function App() {
   }, []);
 
   const handleErrors = (errors) => {
+    const genericMessage = `Your wifi/internet connection may be down. 
+    Make sure you are connected to the internet or data to view videos.`;
     console.error(errors)
     let serverErrors = errors !== null && errors !== undefined ? Array.isArray(errors) ? errors.map((value, i) => {
       let message = value.message;
-      return <Text tabIndex={0} key={`${message}-${i}`}>{message}</Text>
-    }) : <Text tabIndex={0} >{errors.message ? errors.message : errors}</Text> : null
+      return <Text tabIndex={0} key={`${message}-${i}`}>{message}. {genericMessage}</Text>
+    }) : <Text role={"alert"} tabIndex={0} >{errors.message ? errors.message : errors}. {genericMessage}</Text> : null
     setErrors(serverErrors)
     throw new Error("server error occurred")
-  }
-
-  // access to player in all event handlers via event.target
-  const _onReady = (event) => {
-    event.target.pauseVideo();
   }
 
   const switchVideo = () => {
@@ -87,40 +75,18 @@ function App() {
     setTitle(videoList[randomVideoNumber].title)
   }
 
-  const middleContent = () => {
-    let content = videoList.length !== 0 && errors === null && videoID ?
-      <VideoWrapper>
-        <ResponsiveIframe
-          videoId={videoID}
-          opts={opts}
-          onReady={() => _onReady}
-        />
-      </VideoWrapper> :
-      errors;
-
-    return content;
-
-  }
-
   return (
     <Grid>
-      <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"center"} row={1}>
-        <Text tabIndex={0}>Stream lofi hiphop videos for studying/work/etc.</Text>
-        <Text tabIndex={0}>Click the button below the video to get another video.</Text>
-        {title ? <Text tabIndex={0}>title: {title}</Text> : null}
-      </Cell>
-      <Cell aria-live="polite" aria-atomic="true" {...middleCellProps} row={2}>
-        {!isLoading ? middleContent() : 
-        <Fragment>
-            <MDSpinner />
-            <Text>Currently loading videos. They should be available shortly. </Text> 
-        </Fragment>
-        }
-      </Cell>
-      {!isLoading ?
-        <Cell flex={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={'flex-start'} row={3}>
-          <StyledButton disabled={errors !== null && errors !== undefined} onClick={() => switchVideo()}>Watch Another Video</StyledButton>
-        </Cell> : null}
+      <Header title={title} />
+      <VideoSection
+        isLoading={isLoading}
+        videoID={videoID}
+        middleCellProps={middleCellProps}
+        errors={errors}
+        videoList={videoList}
+      />
+      <Bottom isLoading={isLoading} errors={errors} switchVideoCallback={() => switchVideo()} />
+      <Footer/>
     </Grid>
   );
 }

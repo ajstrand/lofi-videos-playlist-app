@@ -3,15 +3,14 @@ import styled from "styled-components";
 export const Grid = styled.div`
   padding:15px;
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr auto auto;
   @media screen and (min-width:500px) {
-    grid-template-rows: 250px 1fr 1fr;
+    grid-template-rows: 1fr 1fr auto auto;
   }
 `;
+//grid-template-rows: 250px 1fr 1fr;
+
 export const Cell = styled.div `
-grid-row-start:${props => props.row ? props.row : "1"};
-grid-column-start:2;
 display:${props => props.flex ? props.flex : null};
 flex-direction:${props => props.flexDirection ? props.flexDirection : null};
 align-items:${props => props.alignItems ? props.alignItems : null};
@@ -41,6 +40,22 @@ export const Text = styled.p`
     text-align:center;
     color:#eeeeee;
     margin-top:15px;
+`;
+
+export const FooterText = styled(Text) `
+  position:fixed;
+  bottom: 0;
+`;
+
+export const AppFooter = styled.footer `
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  display:flex;
+`;
+
+export const Link = styled.a `
+  color:#eeeeee;
 `;
 
 export const StyledButton = styled.button`
