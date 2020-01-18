@@ -7,8 +7,6 @@ import {
   VideoWrapper,
 } from './styledComponents/appComponents';
 
-import YouTube from "react-youtube"
-
 const VideoSection = (props) => {
   const { videoList, errors, videoID, middleCellProps, isLoading } = props;
   const [localID, setLocalVideoID] = useState(videoID)
